@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dino Game</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="game-container">
+        <div class="ground"></div>
+        <div class="dino"></div>
+        <div class="obstacle"></div>
+        <div class="score">Score: <span id="score">0</span></div>
+        <button class="jump-button">Jump</button>
+    </div>
+    <script>
+        const dino = document.querySelector('.dino');
+        const obstacle = document.querySelector('.obstacle');
+        const scoreElement = document.getElementById('score');
+        const jumpButton = document.querySelector('.jump-button');
+        let isJumping = false;
+        let score = 0;
+        let maxScore = 1000;
+        let gameInterval;
+        
+        document.addEventListener('keydown', function(event) {
+            if (event.code === 'Enter' && !isJumping) {
+                jump();
+            }
+        });
+        
+        jumpButton.addEventListener('click', function() {
+            if (!isJumping) {
+                jump();
+            }
+        });
+        
+        function jump() {
+            let position = 0;
+            isJumping = true;
+            let upInterval = setInterval(() => {
+                if (position >= 120) {
+                    clearInterval(upInterval);
+                    let downInterval = setInterval(() => {
+                        if (position <= 0) {
+                            clearInterval(downInterval);
+                            isJumping = false;
+                        }
+                        position -= 5;
+                        dino.style.bottom = position + 'px';
+                    }, 20);
+                }
+                position += 5;
+                dino.style.bottom = position + 'px';
+            }, 20);
+        }
+        
+        function moveObstacle() {
+            let obstaclePosition = 600;
+            gameInterval = setInterval(() => {
+                if (obstaclePosition <= 0) {
+                    obstaclePosition = 600;
+                    updateScore();
+                }
+                obstaclePosition -= 5;
+                obstacle.style.left = obstaclePosition + 'px';
+                checkCollision(obstaclePosition);
+            }, 20);
+        }
+        
+        function updateScore() {
+            if (score < maxScore) {
+                score += 10;
+                scoreElement.textContent = score;
+            }
+            if (score >= maxScore) {
+                alert("SIZ YUTDINGIZ! STICMANGA RAHMAT AYTING");
+                resetGame();
+            }
+        }
+        
+        function checkCollision(obstaclePosition) {
+            let dinoBottom = parseInt(window.getComputedStyle(dino).bottom);
+            if (obstaclePosition > 0 && obstaclePosition < 50 && dinoBottom <= 20) {
+                alert("Game Over! Restarting...");
+                resetGame();
+            }
+        }
+        
+        function resetGame() {
+            clearInterval(gameInterval);
+            score = 0;
+            scoreElement.textContent = score;
+            moveObstacle();
+        }
+        
+        moveObstacle();
+    </script>
+    <style>
+        .jump-button {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 15px 30px;
+            font-size: 18px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+    </style>
+</body>
+</html>
